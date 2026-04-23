@@ -569,6 +569,12 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button class="share-button share-twitter" data-activity="${name}" aria-label="Share on X (Twitter)" title="Share on X (Twitter)">𝕏</button>
+        <button class="share-button share-whatsapp" data-activity="${name}" aria-label="Share on WhatsApp" title="Share on WhatsApp">💬</button>
+        <button class="share-button share-copy" data-activity="${name}" aria-label="Copy link" title="Copy link">🔗</button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -587,7 +593,38 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handlers for share buttons
+    activityCard.querySelectorAll(".share-button").forEach((btn) => {
+      btn.addEventListener("click", () => shareActivity(btn.dataset.activity, btn));
+    });
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Share an activity on social platforms
+  function shareActivity(activityName, triggerButton) {
+    const pageUrl = window.location.href.split("#")[0];
+    const shareText = `Check out "${activityName}" at Mergington High School Extracurricular Activities!`;
+
+    if (triggerButton.classList.contains("share-twitter")) {
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
+      window.open(twitterUrl, "_blank", "noopener,noreferrer,width=550,height=450");
+    } else if (triggerButton.classList.contains("share-whatsapp")) {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + " " + pageUrl)}`;
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    } else if (triggerButton.classList.contains("share-copy")) {
+      navigator.clipboard.writeText(pageUrl).then(() => {
+        const original = triggerButton.textContent;
+        triggerButton.textContent = "✓";
+        triggerButton.classList.add("share-copy-success");
+        setTimeout(() => {
+          triggerButton.textContent = original;
+          triggerButton.classList.remove("share-copy-success");
+        }, 1500);
+      }).catch(() => {
+        showMessage("Could not copy link. Please copy the URL from your browser.", "error");
+      });
+    }
   }
 
   // Event listeners for search and filter
