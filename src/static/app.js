@@ -613,17 +613,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + " " + pageUrl)}`;
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     } else if (triggerButton.classList.contains("share-copy")) {
-      navigator.clipboard.writeText(pageUrl).then(() => {
-        const original = triggerButton.textContent;
-        triggerButton.textContent = "✓";
-        triggerButton.classList.add("share-copy-success");
-        setTimeout(() => {
-          triggerButton.textContent = original;
-          triggerButton.classList.remove("share-copy-success");
-        }, 1500);
-      }).catch(() => {
-        showMessage("Could not copy link. Please copy the URL from your browser.", "error");
-      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(pageUrl).then(() => {
+          const original = triggerButton.textContent;
+          triggerButton.textContent = "✓";
+          triggerButton.classList.add("share-copy-success");
+          setTimeout(() => {
+            triggerButton.textContent = original;
+            triggerButton.classList.remove("share-copy-success");
+          }, 1500);
+        }).catch(() => {
+          showMessage("Could not copy link. Please copy the URL from your browser.", "error");
+        });
+      } else {
+        showMessage("Copy is not supported in this browser. Please copy the URL from your browser.", "error");
+      }
     }
   }
 
